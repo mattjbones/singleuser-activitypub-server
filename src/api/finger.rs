@@ -1,10 +1,9 @@
+use dotenv;
 use serde::{Deserialize, Serialize};
 use std::io::Cursor;
 use tiny_http::StatusCode;
 use tiny_http::{Request, Response};
 use url::Url;
-
-const USERNAME: &str = "mbj";
 
 #[derive(Deserialize, Serialize, Debug)]
 struct FingerLink {
@@ -22,7 +21,6 @@ struct Finger {
 pub fn finger_response(
     request: Request,
     url: Url,
-    addr: &str,
     make_response: &dyn Fn(Request, Response<Cursor<Vec<u8>>>),
 ) {
     print!("finger");
@@ -43,8 +41,9 @@ pub fn finger_response(
         return;
     }
 
-    let base_url = format!("http://{}", addr);
-    let actor_url = format!("{}/{}", &base_url, USERNAME.to_string());
+    let username = dotenv::var(crate::env::USER_ENV_KEY).unwrap();
+    let base_url = dotenv::var(crate::env::DOMAIN_ENV_KEY).unwrap();
+    let actor_url = format!("{}/{}", base_url, username);
 
     let finger_link = FingerLink {
         rel: "self".to_string(),
@@ -53,7 +52,7 @@ pub fn finger_response(
     };
 
     let finger = Finger {
-        subject: format!("acct:{}@{}", USERNAME.to_string(), addr),
+        subject: format!("acct:{}@{}", username, base_url),
         links: vec![finger_link],
     };
 

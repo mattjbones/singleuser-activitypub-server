@@ -1,17 +1,22 @@
 use crate::api::{actor::actor_response, finger::finger_response};
+use dotenv::dotenv;
 use std::io::Cursor;
 use tiny_http::{Request, Response, Server};
 use url::Url;
 
 pub mod api;
+pub mod env;
 
-const PORT: &str = "8000";
 const DEBUG: bool = false;
 
 fn main() {
     println!("starting");
+    dotenv().ok();
 
-    let addr = dbg!(format!("0.0.0.0:{}", PORT));
+    let addr = dbg!(format!(
+        "0.0.0.0:{}",
+        dotenv::var(env::PORT_ENV_KEY).unwrap()
+    ));
 
     let server = Server::http(&addr).unwrap();
 
@@ -34,8 +39,9 @@ fn start_server(server: Server, addr: String) {
             println!("{}", url.path());
 
             match url.path() {
-                "/.well-known/webfinger" => finger_response(request, url, &addr, &make_response),
-                "/mbj" => actor_response(request, &addr, &make_response),
+                "/.well-known/webfinger" => finger_response(request, url, &make_response),
+                "/mbj" => actor_response(request, &make_response),
+
                 _ => make_response(request, Response::from_string("unknown api")),
             }
         }

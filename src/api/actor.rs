@@ -7,8 +7,6 @@ const CONTEXT: [&str; 2] = [
     "https://w3id.org/security/v1",
 ];
 
-const USERNAME: &str = "mbj";
-
 #[derive(Deserialize, Serialize, Debug)]
 enum Actors {
     Person,
@@ -32,18 +30,19 @@ struct Actor {
 
 pub fn actor_response(
     request: Request,
-    addr: &str,
     make_response: &dyn Fn(Request, Response<Cursor<Vec<u8>>>),
 ) {
     print!("actor");
 
-    let base_url = format!("http://{}", addr);
-    let actor_url = format!("{}/{}", &base_url, USERNAME.to_string());
+    let username = dotenv::var(crate::env::USER_ENV_KEY).unwrap();
+    let base_url = dotenv::var(crate::env::DOMAIN_ENV_KEY).unwrap();
+
+    let actor_url = format!("{}/{}", base_url, username);
 
     let actor = Actor {
         id: actor_url.clone(),
         r#type: Actors::Person,
-        preferred_username: USERNAME.to_string(),
+        preferred_username: username,
         inbox: format!("{}/inbox", base_url),
         public_key: ActorPubKey {
             id: format!("{}#main-key", actor_url),
