@@ -1,7 +1,6 @@
 use crate::api::{actor::actor_response, finger::finger_response};
 use dotenv::dotenv;
-use std::io::Cursor;
-use tiny_http::{Request, Response, Server};
+use tiny_http::{Request, Response, Server, StatusCode};
 use url::Url;
 
 pub mod api;
@@ -42,13 +41,16 @@ fn start_server(server: Server, addr: String) {
                 "/.well-known/webfinger" => finger_response(request, url, &make_response),
                 "/mbj" => actor_response(request, &make_response),
 
-                _ => make_response(request, Response::from_string("unknown api")),
+                _ => make_response(request, Response::empty(StatusCode::from(400))),
             }
         }
     }
 }
 
-fn make_response(request: Request, response: Response<Cursor<Vec<u8>>>) {
+fn make_response<T>(request: Request, response: Response<T>)
+where
+    T: std::io::Read,
+{
     match request.respond(response) {
         Err(error) => println!("ded {}", error.to_string()),
         Ok(_) => (),

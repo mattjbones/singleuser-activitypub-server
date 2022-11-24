@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use std::io::Cursor;
-use tiny_http::{Request, Response};
+use std::{io::Cursor, str::FromStr};
+use tiny_http::{Header, Request, Response};
 
 const CONTEXT: [&str; 2] = [
     "https://www.w3.org/ns/activitystreams",
@@ -56,5 +56,9 @@ pub fn actor_response(
     let mut json_actor = dbg!(serde_json::to_string(&actor).unwrap());
     let json_context = format!("\"@context\": [{:?},{:?}],", CONTEXT[0], CONTEXT[1]);
     json_actor.insert_str(1, &json_context);
-    make_response(request, Response::from_string(json_actor));
+    make_response(
+        request,
+        Response::from_string(json_actor)
+            .with_header(Header::from_str("Content-Type:application/json;charset=utf-8").unwrap()),
+    );
 }

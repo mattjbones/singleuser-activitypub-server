@@ -1,8 +1,7 @@
 use dotenv;
 use serde::{Deserialize, Serialize};
-use std::io::Cursor;
-use tiny_http::StatusCode;
-use tiny_http::{Request, Response};
+use std::{io::Cursor, str::FromStr};
+use tiny_http::{Header, Request, Response, StatusCode};
 use url::Url;
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -57,5 +56,9 @@ pub fn finger_response(
     };
 
     let finger_json = dbg!(serde_json::to_string(&finger).unwrap());
-    make_response(request, Response::from_string(finger_json));
+    make_response(
+        request,
+        Response::from_string(finger_json)
+            .with_header(Header::from_str("Content-Type:application/json;charset=utf-8").unwrap()),
+    );
 }
