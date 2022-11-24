@@ -35,9 +35,10 @@ pub fn actor_response(
     print!("actor");
 
     let username = dotenv::var(crate::env::USER_ENV_KEY).unwrap();
-    let base_url = dotenv::var(crate::env::DOMAIN_ENV_KEY).unwrap();
+    let domain = dotenv::var(crate::env::DOMAIN_ENV_KEY).unwrap();
 
-    let actor_url = format!("https://{}/{}", base_url, username);
+    let base_url = format!("https://{}", domain);
+    let actor_url = format!("{}/{}", base_url, username);
 
     let actor = Actor {
         id: actor_url.clone(),
@@ -47,12 +48,12 @@ pub fn actor_response(
         public_key: ActorPubKey {
             id: format!("{}#main-key", actor_url),
             owner: actor_url,
-            public_key_pem: "to_be_confirmed".to_string(),
+            public_key_pem: dotenv::var(crate::env::PEM_ENV_KEY).unwrap(),
         },
     };
 
     // this just shoves the context line above
-    // TODO: investigate serde_json to see if there's a nicer way to do this,
+    // TODO: investigate JSON-LD to see if there's a nicer way to do this,
     let mut json_actor = dbg!(serde_json::to_string(&actor).unwrap());
     let json_context = format!("\"@context\": [{:?},{:?}],", CONTEXT[0], CONTEXT[1]);
     json_actor.insert_str(1, &json_context);
