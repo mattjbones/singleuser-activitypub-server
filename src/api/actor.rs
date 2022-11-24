@@ -37,7 +37,7 @@ pub fn actor_response(
     let username = dotenv::var(crate::env::USER_ENV_KEY).unwrap();
     let base_url = dotenv::var(crate::env::DOMAIN_ENV_KEY).unwrap();
 
-    let actor_url = format!("{}/{}", base_url, username);
+    let actor_url = format!("https://{}/{}", base_url, username);
 
     let actor = Actor {
         id: actor_url.clone(),
@@ -58,7 +58,8 @@ pub fn actor_response(
     json_actor.insert_str(1, &json_context);
     make_response(
         request,
-        Response::from_string(json_actor)
-            .with_header(Header::from_str("Content-Type:application/json;charset=utf-8").unwrap()),
+        Response::from_string(json_actor).with_header(
+            Header::from_str("Content-Type:application/jrd+json;charset=utf-8").unwrap(),
+        ),
     );
 }

@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
 use crate::api::{actor::actor_response, finger::finger_response};
 use dotenv::dotenv;
-use tiny_http::{Request, Response, Server, StatusCode};
+use tiny_http::{Header, Request, Response, Server, StatusCode};
 use url::Url;
 
 pub mod api;
@@ -51,7 +53,7 @@ fn make_response<T>(request: Request, response: Response<T>)
 where
     T: std::io::Read,
 {
-    match request.respond(response) {
+    match request.respond(response.with_header(Header::from_str("Server:sassy").unwrap())) {
         Err(error) => println!("ded {}", error.to_string()),
         Ok(_) => (),
     }

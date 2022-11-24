@@ -25,7 +25,7 @@ pub fn finger_response(
     print!("finger");
 
     let acct_param = url.query_pairs().find_map(|param| {
-        if param.0 == "resource" && param.1.contains("acct:") {
+        if param.0 == "resource" && param.1.contains("acct:") && param.1.contains("mbj") {
             Some(param)
         } else {
             None
@@ -42,7 +42,7 @@ pub fn finger_response(
 
     let username = dotenv::var(crate::env::USER_ENV_KEY).unwrap();
     let base_url = dotenv::var(crate::env::DOMAIN_ENV_KEY).unwrap();
-    let actor_url = format!("{}/{}", base_url, username);
+    let actor_url = format!("https://{}/{}", base_url, username);
 
     let finger_link = FingerLink {
         rel: "self".to_string(),
@@ -58,7 +58,8 @@ pub fn finger_response(
     let finger_json = dbg!(serde_json::to_string(&finger).unwrap());
     make_response(
         request,
-        Response::from_string(finger_json)
-            .with_header(Header::from_str("Content-Type:application/json;charset=utf-8").unwrap()),
+        Response::from_string(finger_json).with_header(
+            Header::from_str("Content-Type:application/jrd+json;charset=utf-8").unwrap(),
+        ),
     );
 }
