@@ -1,6 +1,6 @@
 use dotenv;
 use serde::{Deserialize, Serialize};
-use std::{io::Cursor, str::FromStr};
+use std::{fmt::format, io::Cursor, str::FromStr};
 use tiny_http::{Header, Request, Response, StatusCode};
 use url::Url;
 
@@ -17,15 +17,32 @@ struct Finger {
     links: Vec<FingerLink>,
 }
 
-pub fn finger_response(
+pub fn well_known_response(
     request: Request,
     url: Url,
     make_response: &dyn Fn(Request, Response<Cursor<Vec<u8>>>),
 ) {
-    print!("finger");
+    print!("well-known");
 
+    let path = url.path();
+
+    match path {
+        "/.well-known/webfinger" => webfinger_response(request, url, make_response),
+        "/.well-known/nodeinfo" => (),
+        _ => (),
+    }
+}
+
+fn webfinger_response(
+    request: Request,
+    url: Url,
+    make_response: &dyn Fn(Request, Response<Cursor<Vec<u8>>>),
+) {
+    print!("webfinger");
+
+    let user = dotenv::var(crate::env::USER_ENV_KEY).unwrap();
     let acct_param = url.query_pairs().find_map(|param| {
-        if param.0 == "resource" && param.1.contains("acct:") && param.1.contains("mbj") {
+        if param.0 == "resource" && param.1.contains("acct:") && param.1.contains(&user) {
             Some(param)
         } else {
             None
@@ -35,7 +52,8 @@ pub fn finger_response(
     if acct_param.is_none() {
         make_response(
             request,
-            Response::from_string("no user found, acct:").with_status_code(StatusCode::from(400)),
+            Response::from_string(format!("no user found: {}", url.path()))
+                .with_status_code(StatusCode::from(400)),
         );
         return;
     }

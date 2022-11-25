@@ -1,11 +1,9 @@
-use std::str::FromStr;
-
-use crate::api::{actor::actor_response, finger::finger_response};
+use crate::endpoints::{actor::actor_response, well_known::well_known_response};
 use dotenv::dotenv;
-use tiny_http::{Header, Request, Response, Server, StatusCode};
+use tiny_http::{Request, Response, Server, StatusCode};
 use url::Url;
 
-pub mod api;
+pub mod endpoints;
 pub mod env;
 
 const DEBUG: bool = false;
@@ -39,10 +37,13 @@ fn start_server(server: Server, addr: String) {
             let url = Url::parse(fq_url.as_str()).unwrap();
             println!("{}", url.path());
 
-            match url.path() {
-                "/.well-known/webfinger" => finger_response(request, url, &make_response),
-                "/mbj" => actor_response(request, &make_response),
-
+            let user = dbg!(format!("/{}", dotenv::var(env::USER_ENV_KEY).unwrap()));
+            let path = url.path();
+            match path {
+                _ if path.contains("/.well-known") => {
+                    well_known_response(request, url, &make_response)
+                }
+                _ if path.contains(&user) => actor_response(request, &make_response),
                 _ => make_response(request, Response::empty(StatusCode::from(400))),
             }
         }
@@ -53,7 +54,7 @@ fn make_response<T>(request: Request, response: Response<T>)
 where
     T: std::io::Read,
 {
-    match request.respond(response.with_header(Header::from_str("Server:sassy").unwrap())) {
+    match request.respond(response) {
         Err(error) => println!("ded {}", error.to_string()),
         Ok(_) => (),
     }
