@@ -1,6 +1,6 @@
 use dotenv;
 use serde::{Deserialize, Serialize};
-use std::{fmt::format, io::Cursor, str::FromStr};
+use std::{io::Cursor, str::FromStr};
 use tiny_http::{Header, Request, Response, StatusCode};
 use url::Url;
 
@@ -73,7 +73,7 @@ fn webfinger_response(
         links: vec![finger_link],
     };
 
-    let finger_json = dbg!(serde_json::to_string(&finger).unwrap());
+    let finger_json = serde_json::to_string(&finger).unwrap();
     make_response(
         request,
         Response::from_string(finger_json).with_header(

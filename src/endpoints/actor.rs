@@ -54,7 +54,7 @@ pub fn actor_response(
 
     // this just shoves the context line above
     // TODO: investigate JSON-LD to see if there's a nicer way to do this,
-    let mut json_actor = dbg!(serde_json::to_string(&actor).unwrap());
+    let mut json_actor = serde_json::to_string(&actor).unwrap();
     let json_context = format!("\"@context\": [{:?},{:?}],", CONTEXT[0], CONTEXT[1]);
     json_actor.insert_str(1, &json_context);
     make_response(

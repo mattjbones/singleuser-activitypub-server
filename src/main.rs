@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
 use crate::endpoints::{actor::actor_response, well_known::well_known_response};
 use dotenv::dotenv;
-use tiny_http::{Request, Response, Server, StatusCode};
+use tiny_http::{HeaderField, Request, Response, Server, StatusCode};
 use url::Url;
 
 pub mod endpoints;
@@ -12,10 +14,7 @@ fn main() {
     println!("starting");
     dotenv().ok();
 
-    let addr = dbg!(format!(
-        "0.0.0.0:{}",
-        dotenv::var(env::PORT_ENV_KEY).unwrap()
-    ));
+    let addr = format!("0.0.0.0:{}", dotenv::var(env::PORT_ENV_KEY).unwrap());
 
     let server = Server::http(&addr).unwrap();
 
@@ -33,11 +32,21 @@ fn start_server(server: Server, addr: String) {
             );
             make_response(request, Response::from_string(response_string))
         } else {
-            let fq_url = dbg!(format!("http://{}{}", addr, request.url()));
+            let fq_url = format!("http://{}{}", addr, request.url());
             let url = Url::parse(fq_url.as_str()).unwrap();
+            let host_header = HeaderField::from_str("Host").unwrap();
+            println!(
+                "Host: {:?}",
+                request
+                    .headers()
+                    .into_iter()
+                    .find(|header| header.field == host_header)
+                    .unwrap()
+                    .value
+            );
             println!("{}", url.path());
 
-            let user = dbg!(format!("/{}", dotenv::var(env::USER_ENV_KEY).unwrap()));
+            let user = format!("/{}", dotenv::var(env::USER_ENV_KEY).unwrap());
             let path = url.path();
             match path {
                 _ if path.contains("/.well-known") => {
