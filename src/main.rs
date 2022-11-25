@@ -34,15 +34,14 @@ fn start_server(server: Server, addr: String) {
         } else {
             let fq_url = format!("http://{}{}", addr, request.url());
             let url = Url::parse(fq_url.as_str()).unwrap();
-            let host_header = HeaderField::from_str("Host").unwrap();
+            let forwarded_for_header = HeaderField::from_str("X-Forwarded-For").unwrap();
             println!(
                 "Host: {:?}",
                 request
                     .headers()
                     .into_iter()
-                    .find(|header| header.field == host_header)
+                    .find(|header| header.field == forwarded_for_header)
                     .unwrap()
-                    .value
             );
             println!("{}", url.path());
 
