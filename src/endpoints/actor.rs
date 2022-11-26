@@ -13,6 +13,7 @@ enum Actors {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
 struct ActorPubKey {
     id: String,
     owner: String,
@@ -20,10 +21,12 @@ struct ActorPubKey {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
 struct Actor {
     id: String,
     r#type: Actors,
     preferred_username: String,
+    summary: String,
     inbox: String,
     public_key: ActorPubKey,
 }
@@ -44,6 +47,7 @@ pub fn actor_response(
         id: actor_url.clone(),
         r#type: Actors::Person,
         preferred_username: username,
+        summary: "testing".to_string(),
         inbox: format!("{}/inbox", base_url),
         public_key: ActorPubKey {
             id: format!("{}#main-key", actor_url),

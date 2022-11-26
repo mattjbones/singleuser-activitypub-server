@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use crate::endpoints::{actor::actor_response, well_known::well_known_response};
 use dotenv::dotenv;
-use tiny_http::{HeaderField, Request, Response, Server, StatusCode};
+use tiny_http::{Header, HeaderField, Request, Response, Server, StatusCode};
 use url::Url;
 
 pub mod endpoints;
@@ -41,7 +41,7 @@ fn start_server(server: Server, addr: String) {
                     .headers()
                     .into_iter()
                     .find(|header| header.field == forwarded_for_header)
-                    .unwrap()
+                    .unwrap_or(&Header::from_str("X-Forwarded-For: no-set").unwrap())
             );
             println!("{}", url.path());
 
