@@ -1,6 +1,8 @@
 use std::str::FromStr;
 
-use crate::endpoints::{actor::actor_response, well_known::well_known_response};
+use crate::endpoints::{
+    actor::actor_response, inbox::inbox_response, well_known::well_known_response,
+};
 use dotenv::dotenv;
 use tiny_http::{Header, HeaderField, Request, Response, Server, StatusCode};
 use url::Url;
@@ -41,7 +43,7 @@ fn start_server(server: Server, addr: String) {
                     .headers()
                     .into_iter()
                     .find(|header| header.field == forwarded_for_header)
-                    .unwrap_or(&Header::from_str("X-Forwarded-For: no-set").unwrap())
+                    .unwrap_or(&Header::from_str("X-Forwarded-For: not-set").unwrap())
             );
             println!("{}", url.path());
 
@@ -52,6 +54,7 @@ fn start_server(server: Server, addr: String) {
                     well_known_response(request, url, &make_response)
                 }
                 _ if path.contains(&user) => actor_response(request, &make_response),
+                "/inbox" => inbox_response(request, url, &make_response),
                 _ => make_response(request, Response::empty(StatusCode::from(400))),
             }
         }
