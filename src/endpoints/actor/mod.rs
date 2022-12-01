@@ -31,10 +31,7 @@ struct Actor {
     public_key: ActorPubKey,
 }
 
-pub fn actor_response(
-    request: Request,
-    make_response: &dyn Fn(Request, Response<Cursor<Vec<u8>>>),
-) {
+pub fn actor_handler(request: Request, make_response: &dyn Fn(Request, Response<Cursor<Vec<u8>>>)) {
     print!("actor");
 
     let username = dotenv::var(crate::env::USER_ENV_KEY).unwrap();

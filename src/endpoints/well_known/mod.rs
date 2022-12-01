@@ -17,7 +17,7 @@ struct Finger {
     links: Vec<FingerLink>,
 }
 
-pub fn well_known_response(
+pub fn well_known_handler(
     request: Request,
     url: Url,
     make_response: &dyn Fn(Request, Response<Cursor<Vec<u8>>>),
