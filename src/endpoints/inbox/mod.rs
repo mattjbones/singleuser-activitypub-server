@@ -1,3 +1,4 @@
+use actions::*;
 use std::io::Empty;
 use tiny_http::{Header, Request, Response, StatusCode};
 use types::*;
@@ -35,9 +36,9 @@ pub fn inbox_handler(mut request: Request, make_response: &dyn Fn(Request, Respo
 
     if let Some(some_action) = action {
         match some_action {
-            InboxAction::Delete(delete) => actions::delete::run(delete),
-            InboxAction::Follow(follow) => actions::follow::run(follow),
-            InboxAction::Undo(undo) => actions::undo::run(undo),
+            InboxAction::Delete(delete) => delete::run(delete),
+            InboxAction::Follow(follow) => follow::run(follow),
+            InboxAction::Undo(undo) => undo::run(undo),
         }
     }
 

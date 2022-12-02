@@ -118,7 +118,7 @@ fn make_response<T>(request: Request, response: Response<T>)
 where
     T: std::io::Read,
 {
-    match request.respond(response) {
+    match request.respond(response.with_header(Header::from_str("Server: sassy").unwrap())) {
         Err(error) => println!("ded {}", error.to_string()),
         Ok(_) => (),
     }

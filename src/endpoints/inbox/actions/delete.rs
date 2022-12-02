@@ -1,8 +1,7 @@
 use super::super::types::Delete;
 
 pub fn run(delete: Delete) {
-    println!("delete action");
-    println!("{:?}", delete.actor);
+    println!("delete {:?}", delete.actor);
 
     //check for sure in database
     //verify signature against stored user
