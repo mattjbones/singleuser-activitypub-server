@@ -24,10 +24,11 @@ pub fn inbox_handler(mut request: Request, make_response: &dyn Fn(Request, Respo
     let mut content = String::new();
     request.as_reader().read_to_string(&mut content).unwrap();
 
-    let action = match serde_json::from_str::<InboxAction>(content.as_str()) {
+    let action = match serde_json::from_str::<InboxAction>(&content.as_str()) {
         Ok(action) => Some(action),
         Err(err) => {
             println!("{}", err);
+            println!("{}", content.as_str());
             None
         }
     };
